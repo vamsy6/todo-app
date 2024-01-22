@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -9,7 +10,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,18 +18,46 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { PencilSVG, DeleteSVG, AddSVG} from "./icons";
+import { PencilSVG, DeleteSVG, AddSVG, DoneSVG } from "./components/ui/icons";
 import { ThemeProvider } from "./components/ui/theme-provider";
 import { ModeToggle } from "./components/ui/mode-toggle";
-import { Toaster, toast } from "sonner";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Label } from "@/components/ui/label";
+import { Toaster } from "@/components/ui/toaster";
+import { useToast } from "@/components/ui/use-toast";
 
 function App() {
+  const [inputValue, setInputValue] = useState("");
+  const [displayText, setDisplayText] = useState([]);
+  const [date, setDate] = useState(false);
+  const dateObj = new Date();
+  console.log(dateObj);
+  const handleInputChange = (e) => {
+    setInputValue(e.target.value);
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      handleButtonClick();
+      toast({
+        title: "A todo item has been added to your list",
+      });
+    }
+  };
+
+  const handleButtonClick = (e) => {
+    if (inputValue.trim() === "") {
+      toast({
+        title: "Please enter a task before adding!",
+        variant: "destructive",
+      });
+      date(false);
+    }
+    setDisplayText(inputValue);
+    setDate(true);
+    setInputValue("");
+  };
+
+  const { toast } = useToast();
   return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
       <>
@@ -37,24 +65,30 @@ function App() {
           <ModeToggle />
         </div>
         <div className="container p-5 flex flex-col items-center md:flex-row md:justify-center">
-        <Input
-    className="w-3/5 md:w-2/3 mb-3.5 md:mr-3.5 md:mb-0 md:max-w-[300px]"
-    type="text"
-    placeholder="Enter your tasks here"
-  />
+          <Input
+            onKeyDown={handleKeyDown}
+            value={inputValue}
+            onChange={handleInputChange}
+            className="w-3/5 md:w-2/3 mb-3.5 md:mr-3.5 md:mb-0 md:max-w-[300px]"
+            type="text"
+            placeholder="Enter your tasks here"
+          />
 
           <Button
-            onClick={() =>
-              toast.success("A todo item has been added to your list")
-            }
             type="submit"
+            onClick={() => {
+              toast({
+                title: "A todo item has been added to your list",
+              });
+              handleButtonClick();
+            }}
           >
             Add <AddSVG marginLeft={2} />
           </Button>
           <Toaster />
         </div>
 
-        <Table className=" w-3/20 mx-auto">
+        <Table className=" w-3/20 mx-auto min-w-[450px]">
           <TableCaption>Number of tasks - 1</TableCaption>
           <TableHeader>
             <TableRow>
@@ -65,31 +99,35 @@ function App() {
           </TableHeader>
           <TableBody>
             <TableRow>
-              <span>
-                <Checkbox />
-                <TableCell className="font-medium">TASK#1</TableCell>
-              </span>
+              <TableCell className="font-medium">
+                <Label htmlFor="name">Task#1</Label>
+              </TableCell>
+
               <TableCell>
-                Organize Home Office Space and Declutter Desk
+                {displayText}
+                <br />
+                <p className="text-grey">
+                  {date
+                    ? "Created on" +
+                      " " +
+                      dateObj.toString().replace(/(\d{2}:\d{2}):\d{2}.*/, "$1")
+                    : null}
+                </p>
               </TableCell>
               <TableCell>
                 <DropdownMenu>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <DropdownMenuTrigger className="font-black">
-                          ...
-                        </DropdownMenuTrigger>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>More Options</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
+                  <DropdownMenuTrigger className="font-black">
+                    ...
+                  </DropdownMenuTrigger>
 
                   <DropdownMenuContent>
                     <DropdownMenuLabel>Actions</DropdownMenuLabel>
                     <DropdownMenuSeparator />
+
+                    <DropdownMenuItem>
+                      Done&nbsp;
+                      <DoneSVG />
+                    </DropdownMenuItem>
 
                     <DropdownMenuItem>
                       Edit&nbsp;
