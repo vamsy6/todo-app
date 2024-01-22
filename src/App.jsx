@@ -30,18 +30,19 @@ function App() {
         <div className="dmode">
           <ModeToggle />
         </div>
-        <div className="container p-5 flex justify-center">
-          <Input
-            className="w-3/12 mr-3.5"
-            type="text"
-            placeholder="Enter your tasks here"
-          />
+        <div className="container p-5 flex flex-col items-center md:flex-row md:justify-center">
+  <Input
+    className="w-3/12 mb-3.5 md:mr-3.5 md:mb-0"
+    type="text"
+    placeholder="Enter your tasks here"
+  />
 
-          <Button onClick={() => toast.success("A todo item has been added to your list")} type="submit">
-            Add
-          </Button>
-          <Toaster />
-        </div>
+  <Button onClick={() => toast.success("A todo item has been added to your list")} type="submit">
+    Add
+  </Button>
+  <Toaster />
+</div>
+
 
         <Table className=" w-3/20 mx-auto">
           <TableCaption>Number of tasks - 1</TableCaption>
