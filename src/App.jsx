@@ -18,7 +18,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { PencilSVG, DeleteSVG, AddSVG } from "./icons";
+import { PencilSVG, DeleteSVG, AddSVG} from "./icons";
 import { ThemeProvider } from "./components/ui/theme-provider";
 import { ModeToggle } from "./components/ui/mode-toggle";
 import { Toaster, toast } from "sonner";
