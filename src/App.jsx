@@ -18,12 +18,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { PencilSVG, DeleteSVG, AddSVG, DoneSVG } from "./components/ui/icons";
+import { PencilSVG, DeleteSVG, AddSVG, DoneSVG, ErrorSVG } from "./components/ui/icons";
 import { ThemeProvider } from "./components/ui/theme-provider";
 import { ModeToggle } from "./components/ui/mode-toggle";
 import { Label } from "@/components/ui/label";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/components/ui/use-toast";
+import { Checkbox } from "./components/ui/checkbox";
 
 function App() {
   const [inputValue, setInputValue] = useState("");
@@ -39,7 +40,11 @@ function App() {
     if (e.key === "Enter") {
       handleButtonClick();
       toast({
-        title: "A todo item has been added to your list",
+        title:  (
+          <div className="flex">
+            <DoneSVG />&nbsp;A todo item has been added to your list
+          </div>
+        ),
       });
     }
   };
@@ -47,7 +52,11 @@ function App() {
   const handleButtonClick = (e) => {
     if (inputValue.trim() === "") {
       toast({
-        title: "Please enter a task before adding!",
+        title:  (
+          <div className="flex">
+            <ErrorSVG />&nbsp;Please enter a task before adding!
+          </div>
+        ),
         variant: "destructive",
       });
       date(false);
@@ -78,7 +87,11 @@ function App() {
             type="submit"
             onClick={() => {
               toast({
-                title: "A todo item has been added to your list",
+                title:  (
+                  <div className="flex">
+                    <DoneSVG />&nbsp;A todo item has been added to your list
+                  </div>
+                ),
               });
               handleButtonClick();
             }}
@@ -100,7 +113,7 @@ function App() {
           <TableBody>
             <TableRow>
               <TableCell className="font-medium">
-                <Label htmlFor="name">Task#1</Label>
+              <Checkbox /><Label htmlFor="name">{" " + "Task#1"}</Label> 
               </TableCell>
 
               <TableCell>
@@ -124,11 +137,7 @@ function App() {
                     <DropdownMenuLabel>Actions</DropdownMenuLabel>
                     <DropdownMenuSeparator />
 
-                    <DropdownMenuItem>
-                      Done&nbsp;
-                      <DoneSVG />
-                    </DropdownMenuItem>
-
+                  
                     <DropdownMenuItem>
                       Edit&nbsp;
                       <PencilSVG />
