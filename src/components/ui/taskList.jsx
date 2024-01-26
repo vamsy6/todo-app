@@ -18,6 +18,7 @@ import {
   ContextMenuItem,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
+import 'animate.css';
 
 export default function taskList({
   tasks,
@@ -28,7 +29,7 @@ export default function taskList({
   return (
     <TableBody>
       {tasks.map((task, index) => (
-        <TableRow key={task.id}>
+        <TableRow key={task.id}  className= "animate__animated animate__bounceIn">
           <TableCell className="font-medium">
             <div className="flex space-x-1.5">
               <Checkbox />{" "}

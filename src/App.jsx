@@ -10,14 +10,14 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { AddSVG, DoneSVG, ErrorSVG, UpdateSVG } from "./components/ui/icons";
-import { ThemeProvider, useTheme } from "./components/ui/theme-provider";
+import { ThemeProvider } from "./components/ui/theme-provider";
 import { ModeToggle } from "./components/ui/mode-toggle";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/components/ui/use-toast";
 import TaskList from "./components/ui/taskList";
 import { motion } from "framer-motion";
 function App() {
-  const { theme } = useTheme();
+  const { toast } = useToast();
   const [inputValue, setInputValue] = useState("");
   const [tasks, setTasks] = useState(() => {
     const savedTasks = localStorage.getItem("tasks");
@@ -93,7 +93,7 @@ function App() {
     setInputValue("");
   };
 
-  const deleteTask = (taskId, taskIndex) => {
+  const deleteTask = (taskId) => {
     if (editingTask && editingTask.id === taskId) {
       toast({
         title: (
@@ -107,10 +107,10 @@ function App() {
       return;
     }
 
-    const updatedTasks = tasks.filter((task) => task.id !== taskId);
+    const updatedTasks = tasks.filter((task) => task.id !== taskId); //give an error message update isnt finished
     setTasks(updatedTasks);
   };
-  const { toast } = useToast();
+
   return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
       <>
