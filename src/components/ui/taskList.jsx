@@ -11,8 +11,13 @@ import {
 import { PencilSVG, DeleteSVG } from "./icons";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "./checkbox";
-
-export default function taskList({ tasks, handleEdit, deleteTask }) {
+import { motion } from "framer-motion";
+export default function taskList({
+  tasks,
+  handleEdit,
+  deleteTask,
+  editingTask,
+}) {
   return (
     <TableBody>
       {tasks.map((task, index) => (
@@ -26,9 +31,7 @@ export default function taskList({ tasks, handleEdit, deleteTask }) {
           <TableCell>
             {task.text}
             <br />
-            <p className="text-grey">
-              Created on {task.createdAt.toLocaleTimeString()}
-            </p>
+            <p className="text-grey">Created on {formatDate(task.createdAt)}</p>
           </TableCell>
           <TableCell>
             <DropdownMenu>
@@ -39,16 +42,17 @@ export default function taskList({ tasks, handleEdit, deleteTask }) {
               <DropdownMenuContent>
                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
                 <DropdownMenuSeparator />
+                <motion.div whileTap={{ scale: 0.85 }}>
+                  <DropdownMenuItem onClick={() => handleEdit(task)}>
+                    Edit&nbsp;
+                    <PencilSVG />
+                  </DropdownMenuItem>
 
-                <DropdownMenuItem onClick={() => handleEdit(task)}>
-                  Edit&nbsp;
-                  <PencilSVG />
-                </DropdownMenuItem>
-
-                <DropdownMenuItem onClick={() => deleteTask(task.id, index)}>
-                  Delete&nbsp;
-                  <DeleteSVG />
-                </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => deleteTask(task.id, index)}>
+                    Delete&nbsp;
+                    <DeleteSVG />
+                  </DropdownMenuItem>
+                </motion.div>
               </DropdownMenuContent>
             </DropdownMenu>
           </TableCell>
@@ -56,4 +60,14 @@ export default function taskList({ tasks, handleEdit, deleteTask }) {
       ))}
     </TableBody>
   );
+  
+  function formatDate(dateString) {
+    const options = {
+      month: "long",
+      day: "numeric",
+      hour: "numeric",
+      minute: "numeric",
+    };
+    return new Date(dateString).toLocaleDateString(undefined, options);
+  }
 }

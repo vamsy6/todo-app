@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,20 +9,33 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { AddSVG, DoneSVG, ErrorSVG, UpdateSVG } from "./components/ui/icons";
+import {
+  AddSVG,
+  DoneSVG,
+  ErrorSVG,
+  UpdateSVG
+} from "./components/ui/icons";
 import { ThemeProvider } from "./components/ui/theme-provider";
 import { ModeToggle } from "./components/ui/mode-toggle";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/components/ui/use-toast";
 import TaskList from "./components/ui/taskList";
+import { motion } from "framer-motion";
 function App() {
   const [inputValue, setInputValue] = useState("");
-  const [tasks, setTasks] = useState([]);
+  const [tasks, setTasks] = useState(() => {
+    const savedTasks = localStorage.getItem("tasks");
+    return savedTasks ? JSON.parse(savedTasks) : [];
+  });
   const [editingTask, setEditingTask] = useState(null);
 
   const handleInputChange = (e) => {
     setInputValue(e.target.value);
   };
+
+  useEffect(() => {
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+  }, [tasks]);
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
@@ -41,13 +54,6 @@ function App() {
   const handleEdit = (task) => {
     setInputValue(task.text);
     setEditingTask(task);
-  };
-
-  const toggleCompletion = (taskId) => {
-    const updatedTasks = tasks.map((task) =>
-      task.id === taskId ? { ...task, completed: !task.completed } : task
-    );
-    setTasks(updatedTasks);
   };
 
   const addTask = () => {
@@ -83,8 +89,7 @@ function App() {
       const newTask = {
         id: uuidv4(),
         text: inputValue,
-        createdAt: new Date(),
-        completed: false,
+        createdAt: new Date().toISOString(),
       };
       setTasks([...tasks, newTask]);
     }
@@ -93,17 +98,21 @@ function App() {
   };
 
   const deleteTask = (taskId, taskIndex) => {
+    if (editingTask && editingTask.id === taskId) {
+      toast({
+        title: (
+          <div className="flex">
+            <ErrorSVG />
+            &nbsp;Finish the update to delete the task.
+          </div>
+        ),
+        variant: "destructive",
+      });
+      return;
+    }
+
     const updatedTasks = tasks.filter((task) => task.id !== taskId);
     setTasks(updatedTasks);
-    toast({
-      title: (
-        <div className="flex">
-          <DoneSVG />
-          &nbsp;Task#{taskIndex + 1} has been successfully deleted.
-        </div>
-      ),
-      variant: "destructive",
-    });
   };
   const { toast } = useToast();
   return (
@@ -112,6 +121,18 @@ function App() {
         <div className="dmode">
           <ModeToggle />
         </div>
+        <div className="flex justify-center items-center">
+          <h2
+            className="mb-5 text-3xl pb-5 font-semibold tracking-wide border-b"
+            style={{
+              paddingLeft: "10px",
+              paddingRight: "10px",
+            }}
+          >
+            Daily Task Organizer
+          </h2>
+        </div>
+
         <div className="container p-5 flex flex-col items-center md:flex-row md:justify-center">
           <Input
             onKeyDown={handleKeyDown}
@@ -121,36 +142,39 @@ function App() {
             type="text"
             placeholder="Enter your tasks here"
           />
-
-          <Button
-            type="submit"
-            onClick={() => {
-              toast({
-                title: (
-                  <div className="flex">
-                    <DoneSVG />
-                    &nbsp;A todo item has been added to your list
-                  </div>
-                ),
-              });
-              addTask();
-            }}
-          >
-            {editingTask ? (
-              <>
-                Update <UpdateSVG marginLeft={2} />
-              </>
-            ) : (
-              <>
-                Add <AddSVG marginLeft={2} />
-              </>
-            )}
-          </Button>
+          <motion.div whileTap={{ scale: 0.85 }}>
+            <Button
+              type="submit"
+              onClick={() => {
+                toast({
+                  title: (
+                    <div className="flex">
+                      <DoneSVG />
+                      &nbsp;A todo item has been added to your list
+                    </div>
+                  ),
+                });
+                addTask();
+              }}
+            >
+              {editingTask ? (
+                <>
+                  Update <UpdateSVG marginLeft={2} />
+                </>
+              ) : (
+                <>
+                  Add <AddSVG marginLeft={2} />
+                </>
+              )}
+            </Button>
+          </motion.div>
           <Toaster />
         </div>
 
         <Table className=" w-3/20 mx-auto min-w-[450px]">
-          <TableCaption>Number of tasks - {tasks.length}</TableCaption>
+          <TableCaption className="mb-5">
+            Number of tasks - {tasks.length}
+          </TableCaption>
           <TableHeader>
             <TableRow>
               <TableHead className="w-[100px]">Tasks</TableHead>
@@ -158,10 +182,12 @@ function App() {
               <TableHead></TableHead>
             </TableRow>
           </TableHeader>
+
           <TaskList
             tasks={tasks}
             handleEdit={handleEdit}
             deleteTask={deleteTask}
+            editingTask={editingTask}
           />
         </Table>
       </>

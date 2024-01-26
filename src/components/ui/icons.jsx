@@ -89,7 +89,7 @@ export const ErrorSVG = () => (
 
 export const UpdateSVG = ({ marginLeft }) => (
   <svg
-  style={{ marginLeft: `${marginLeft}px` }}
+    style={{ marginLeft: `${marginLeft}px` }}
     width="15"
     height="15"
     viewBox="0 0 15 15"
@@ -105,4 +105,8 @@ export const UpdateSVG = ({ marginLeft }) => (
   </svg>
 );
 
-export default { PencilSVG, DeleteSVG, AddSVG, DoneSVG, ErrorSVG, UpdateSVG };
+
+
+
+
+export default { PencilSVG, DeleteSVG, AddSVG, DoneSVG, ErrorSVG, UpdateSVG};
