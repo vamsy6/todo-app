@@ -1,71 +1,110 @@
 import { useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   Table,
-  TableBody,
   TableCaption,
-  TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { PencilSVG, DeleteSVG, AddSVG, DoneSVG, ErrorSVG } from "./components/ui/icons";
+import { AddSVG, DoneSVG, ErrorSVG, UpdateSVG } from "./components/ui/icons";
 import { ThemeProvider } from "./components/ui/theme-provider";
 import { ModeToggle } from "./components/ui/mode-toggle";
-import { Label } from "@/components/ui/label";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/components/ui/use-toast";
-import { Checkbox } from "./components/ui/checkbox";
-
+import TaskList from "./components/ui/taskList";
 function App() {
   const [inputValue, setInputValue] = useState("");
-  const [displayText, setDisplayText] = useState([]);
-  const [date, setDate] = useState(false);
-  const dateObj = new Date();
-  console.log(dateObj);
+  const [tasks, setTasks] = useState([]);
+  const [editingTask, setEditingTask] = useState(null);
+
   const handleInputChange = (e) => {
     setInputValue(e.target.value);
   };
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
-      handleButtonClick();
+      addTask();
       toast({
-        title:  (
+        title: (
           <div className="flex">
-            <DoneSVG />&nbsp;A todo item has been added to your list
+            <DoneSVG />
+            &nbsp;A todo item has been added to your list
           </div>
         ),
       });
     }
   };
 
-  const handleButtonClick = (e) => {
+  const handleEdit = (task) => {
+    setInputValue(task.text);
+    setEditingTask(task);
+  };
+
+  const toggleCompletion = (taskId) => {
+    const updatedTasks = tasks.map((task) =>
+      task.id === taskId ? { ...task, completed: !task.completed } : task
+    );
+    setTasks(updatedTasks);
+  };
+
+  const addTask = () => {
     if (inputValue.trim() === "") {
       toast({
-        title:  (
+        title: (
           <div className="flex">
-            <ErrorSVG />&nbsp;Please enter a task before adding!
+            <ErrorSVG />
+            &nbsp;Please enter a task before adding!
           </div>
         ),
         variant: "destructive",
       });
-      date(false);
+      return;
     }
-    setDisplayText(inputValue);
-    setDate(true);
+
+    if (editingTask) {
+      setTasks(
+        tasks.map((task) =>
+          task.id === editingTask.id ? { ...task, text: inputValue } : task
+        )
+      );
+      toast({
+        title: (
+          <div className="flex">
+            <DoneSVG />
+            &nbsp;Task has been successfully updated.
+          </div>
+        ),
+      });
+      setEditingTask(null);
+    } else {
+      const newTask = {
+        id: uuidv4(),
+        text: inputValue,
+        createdAt: new Date(),
+        completed: false,
+      };
+      setTasks([...tasks, newTask]);
+    }
+
     setInputValue("");
   };
 
+  const deleteTask = (taskId, taskIndex) => {
+    const updatedTasks = tasks.filter((task) => task.id !== taskId);
+    setTasks(updatedTasks);
+    toast({
+      title: (
+        <div className="flex">
+          <DoneSVG />
+          &nbsp;Task#{taskIndex + 1} has been successfully deleted.
+        </div>
+      ),
+      variant: "destructive",
+    });
+  };
   const { toast } = useToast();
   return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
@@ -87,22 +126,31 @@ function App() {
             type="submit"
             onClick={() => {
               toast({
-                title:  (
+                title: (
                   <div className="flex">
-                    <DoneSVG />&nbsp;A todo item has been added to your list
+                    <DoneSVG />
+                    &nbsp;A todo item has been added to your list
                   </div>
                 ),
               });
-              handleButtonClick();
+              addTask();
             }}
           >
-            Add <AddSVG marginLeft={2} />
+            {editingTask ? (
+              <>
+                Update <UpdateSVG marginLeft={2} />
+              </>
+            ) : (
+              <>
+                Add <AddSVG marginLeft={2} />
+              </>
+            )}
           </Button>
           <Toaster />
         </div>
 
         <Table className=" w-3/20 mx-auto min-w-[450px]">
-          <TableCaption>Number of tasks - 1</TableCaption>
+          <TableCaption>Number of tasks - {tasks.length}</TableCaption>
           <TableHeader>
             <TableRow>
               <TableHead className="w-[100px]">Tasks</TableHead>
@@ -110,48 +158,11 @@ function App() {
               <TableHead></TableHead>
             </TableRow>
           </TableHeader>
-          <TableBody>
-            <TableRow>
-              <TableCell className="font-medium">
-              <Checkbox /><Label htmlFor="name">{" " + "Task#1"}</Label> 
-              </TableCell>
-
-              <TableCell>
-                {displayText}
-                <br />
-                <p className="text-grey">
-                  {date
-                    ? "Created on" +
-                      " " +
-                      dateObj.toString().replace(/(\d{2}:\d{2}):\d{2}.*/, "$1")
-                    : null}
-                </p>
-              </TableCell>
-              <TableCell>
-                <DropdownMenu>
-                  <DropdownMenuTrigger className="font-black">
-                    ...
-                  </DropdownMenuTrigger>
-
-                  <DropdownMenuContent>
-                    <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-
-                  
-                    <DropdownMenuItem>
-                      Edit&nbsp;
-                      <PencilSVG />
-                    </DropdownMenuItem>
-
-                    <DropdownMenuItem>
-                      Delete&nbsp;
-                      <DeleteSVG />
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </TableCell>
-            </TableRow>
-          </TableBody>
+          <TaskList
+            tasks={tasks}
+            handleEdit={handleEdit}
+            deleteTask={deleteTask}
+          />
         </Table>
       </>
     </ThemeProvider>
