@@ -12,6 +12,13 @@ import { PencilSVG, DeleteSVG } from "./icons";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "./checkbox";
 import { motion } from "framer-motion";
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from "@/components/ui/context-menu";
+
 export default function taskList({
   tasks,
   handleEdit,
@@ -29,9 +36,25 @@ export default function taskList({
             </div>
           </TableCell>
           <TableCell>
-            {task.text}
-            <br />
-            <p className="text-grey">Created on {formatDate(task.createdAt)}</p>
+            <ContextMenu>
+              <ContextMenuTrigger type="right-click">
+                <div className="trigger-area">
+                  {task.text}
+                  <br />
+                  <p className="text-grey">
+                    Created on {formatDate(task.createdAt)}
+                  </p>
+                </div>
+              </ContextMenuTrigger>
+              <ContextMenuContent>
+                <ContextMenuItem onClick={() => handleEdit(task)}>
+                  Edit
+                </ContextMenuItem>
+                <ContextMenuItem onClick={() => deleteTask(task.id, index)}>
+                  Delete
+                </ContextMenuItem>
+              </ContextMenuContent>
+            </ContextMenu>
           </TableCell>
           <TableCell>
             <DropdownMenu>
@@ -60,7 +83,7 @@ export default function taskList({
       ))}
     </TableBody>
   );
-  
+
   function formatDate(dateString) {
     const options = {
       month: "long",

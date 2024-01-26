@@ -9,19 +9,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  AddSVG,
-  DoneSVG,
-  ErrorSVG,
-  UpdateSVG
-} from "./components/ui/icons";
-import { ThemeProvider } from "./components/ui/theme-provider";
+import { AddSVG, DoneSVG, ErrorSVG, UpdateSVG } from "./components/ui/icons";
+import { ThemeProvider, useTheme } from "./components/ui/theme-provider";
 import { ModeToggle } from "./components/ui/mode-toggle";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/components/ui/use-toast";
 import TaskList from "./components/ui/taskList";
 import { motion } from "framer-motion";
 function App() {
+  const { theme } = useTheme();
   const [inputValue, setInputValue] = useState("");
   const [tasks, setTasks] = useState(() => {
     const savedTasks = localStorage.getItem("tasks");
