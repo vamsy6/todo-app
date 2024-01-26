@@ -109,6 +109,14 @@ function App() {
 
     const updatedTasks = tasks.filter((task) => task.id !== taskId); //give an error message update isnt finished
     setTasks(updatedTasks);
+    toast({
+      title: (
+        <div className="flex">
+          <DoneSVG />
+          &nbsp;Task has been successfully deleted.
+        </div>
+         ),
+        });
   };
 
   return (
